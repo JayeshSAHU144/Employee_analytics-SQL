@@ -93,9 +93,64 @@ WHERE State IS NULL OR State = '' ;
 SELECT count(*) FROM raw_employees
 WHERE Statefull IS NULL OR Statefull = '' ;
 
+-- -----------------------------------------
+-- 5. Window functions with CTE
+-- -----------------------------------------
+-- 👉 Find highest-paid employee in each department (using Window Function)
+WITH temp AS (
+	SELECT EmployeeID, First_Name, Department, Salary, 
+		ROW_NUMBER() OVER ( PARTITION BY Department 
+			ORDER BY Salary DESC) AS rn
+            FROM raw_employees) 
+SELECT * FROM temp 
+WHERE rn = 1 ;
 
+-- 👉 Show each employee with department average salary.
+SELECT EmployeeID, Department, Salary,
+       AVG(Salary) OVER (PARTITION BY Department) AS dept_avg
+FROM raw_employees;
 
+-- 👉 Show employees whose salary is ABOVE their department average.
+WITH Avg_dept AS (SELECT EmployeeID, Department, Salary,
+       AVG(Salary) OVER (PARTITION BY Department) AS dept_avg
+FROM raw_employees)
+SELECT * FROM Avg_dept 
+WHERE Salary >= dept_avg;
 
+-- -----------------------------------------
+-- 6. 💀 SQL Challenge Set (Advanced Level)
+-- -----------------------------------------
+-- 👉 For each department, find the 3rd highest salary.
+SELECT EmployeeID, Department, Salary
+    FROM (SELECT EmployeeID, Department, Salary,
+		DENSE_RANK() OVER ( PARTITION BY Department ORDER BY Salary DESC) AS rn 
+		FROM raw_employees) AS High_salary
+        WHERE rn = 3;
+        
+-- 👉 Show month-wise hiring count using Start_Date.
+SELECT 
+    MONTH(Start_Date) AS Month_Hire, YEAR(Start_Date) AS year_hire,
+    COUNT(EmployeeID) AS Total_emp
+FROM
+    raw_employees
+GROUP BY Month_hire, year_hire
+ORDER BY year_hire;
 
+-- 👉 Find employees who earn more than their department average  
+-- ❌ Without CTE
+-- ❌ Without window function
+SELECT EmployeeID, a.Salary, a.Department, avg_t.Dep_avg
+FROM raw_employees a
+join (SELECT Department, AVG(Salary) AS Dep_avg FROM raw_employees GROUP BY Department) as avg_t 
+ on a.Department = avg_t.Department
+WHERE a.Salary > avg_t.Dep_avg;
 
+-- 👉 Find departments where salary gap between top 2 earners > 50000
+WITH top_earners AS (SELECT Department, Salary, DENSE_RANK() OVER (PARTITION BY Department ORDER BY Salary DESC) AS rn,
+ LAG(Salary) OVER (PARTITION BY Department ORDER BY Salary DESC) AS prev_salary
+FROM raw_employees)
+SELECT Department, Salary, rn, prev_salary,
+       Salary - prev_salary AS gap
+FROM top_earners
+WHERE rn = 1;
 
