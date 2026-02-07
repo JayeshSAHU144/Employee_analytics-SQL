@@ -100,3 +100,36 @@ Through this project, I learned:
 - Window functions
 - CTE-based reporting
 - Performance analysis
+
+---
+
+## 🧠 Advanced Analytics (Recent Work)
+
+- Implemented Window Functions:
+
+  - ROW_NUMBER(), RANK(), DENSE_RANK()
+  - Department-wise salary ranking
+  - Top N employees per department
+
+- Used CTEs (WITH clause) for:
+
+  - Multi-step analytical queries
+  - Improving query readability
+  - Filtering window function results
+
+- Practiced Subqueries and Joins for:
+
+  - Comparing employee salary with department average
+  - Rewriting window function logic using joins
+  - Understanding different query approaches
+
+- Built Analytical Reports:
+
+  - Employees earning above department average
+  - Year-wise and month-wise hiring trends
+  - Salary distribution analysis
+
+- Improved SQL Debugging Skills:
+  - Resolved ambiguous column errors
+  - Fixed aliasing and grouping issues
+  - Handled derived table errors
